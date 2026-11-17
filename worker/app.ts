@@ -1,8 +1,5 @@
 import { Hono } from "hono";
-
-export interface Env {
-  DB?: D1Database;
-}
+import type { Env } from "./env";
 
 export function createApp() {
   const app = new Hono<{ Bindings: Env }>();
