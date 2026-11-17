@@ -185,7 +185,7 @@ describe("POST /api/telegram/webhook", () => {
     const body = fetchCallBody(fetchMock.mock.calls[1]);
     expect(body.reply_markup.inline_keyboard[0][0]).toEqual({
       text: "Открыть Mini App",
-      url: "https://app.example",
+      web_app: { url: "https://app.example" },
     });
   });
 

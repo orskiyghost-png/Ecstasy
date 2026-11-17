@@ -98,7 +98,9 @@ export async function handleTelegramWebhook(
   }
 
   await sendMessage(token, chatId, "Откройте Mini App:", {
-    inline_keyboard: [[{ text: "Открыть Mini App", url: env.APP_BASE_URL }]],
+    inline_keyboard: [
+      [{ text: "Открыть Mini App", web_app: { url: env.APP_BASE_URL } }],
+    ],
   });
   return json({ ok: true });
 }
