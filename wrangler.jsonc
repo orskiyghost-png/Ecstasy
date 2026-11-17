@@ -11,7 +11,7 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "ecstasy-local",
+      "database_name": "ecstasy",
       "database_id": "cb2a1e4b-8a40-43df-be7b-0f6a7b338e09",
       "migrations_dir": "migrations"
     }
