@@ -2,7 +2,7 @@
 
 ## Статус
 
-Локальный каркас Этапа 1 создан. Telegram и provider переменные пока не считываются кодом. Единственный Worker обслуживает UI и API, отдельный `API_BASE_URL` не нужен.
+Локальный каркас Этапа 1 создан. Webhook считывает `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_CHANNEL_ID`, `TELEGRAM_CHANNEL_URL` и `APP_BASE_URL`. Provider переменные кодом не считываются. Единственный Worker обслуживает UI и API, отдельный `API_BASE_URL` не нужен.
 
 | Имя | Чувствительность | Назначение | Настройка |
 |---|---|---|---|
@@ -18,12 +18,12 @@
 
 ## Локальная разработка
 
-Wrangler использует игнорируемый `.dev.vars` для будущих локальных Worker secrets. Не копируй реальные значения в `.env.example`. Команды запуска и D1 migration описаны в `README.md`; Telegram secrets пока не требуются локальному каркасу.
+Wrangler использует игнорируемый `.dev.vars` для локальных Worker secrets. Не копируй реальные значения в `.env.example`. Команды запуска и D1 migration описаны в `README.md`. Для локальной проверки webhook нужны те же имена переменных, что указаны в таблице.
 Wrangler конфигурация содержит только `local-only-placeholder`; не заменяй его внешним database ID до создания и подтверждения настоящей D1.
 
 ## Production
 
-Секреты задаются через Cloudflare Worker secrets/bindings после отдельного аудита доступа и ресурсов. Не передавай секреты через frontend, GitHub commit, обычные логи или документацию. После настройки проверяй только наличие имени binding, не его значение.
+Telegram Worker secrets заданы владельцем в Cloudflare; локально их значение не проверялось. GitHub secrets `CLOUDFLARE_API_TOKEN` и `CLOUDFLARE_ACCOUNT_ID` подтверждены через `gh secret list`. Переменная `CLOUDFLARE_DEPLOY_ENABLED` создана со значением `false`. Не передавай секреты через frontend, GitHub commit, логи или документацию. После настройки проверяй только наличие имени binding, не его значение.
 
 ## Инцидент с раскрытыми credentials
 

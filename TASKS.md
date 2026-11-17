@@ -11,16 +11,21 @@
 - [x] Проверить diff, форматирование и отсутствие известных форматов секретов в новых файлах.
 - [x] Создать commit и отправить в `origin/main`.
 
-## Этап 1 — локальный каркас готов; внешняя интеграция заблокирована
+## Этап 1 — код готов; живая интеграция заблокирована
 
-- [ ] Проверить и безопасно настроить Cloudflare account access. Не использовать credentials, ранее отправленные в чат; сначала отозвать и ротировать их.
-- [ ] Подтвердить Telegram bot, обязательный канал и необходимые права.
-- [ ] Подтвердить домен и способ разделения preview/production.
-- [x] Выбрать GitHub Actions для CI checks; deploy не настроен.
-- [x] Реализовать локальный Worker, D1 migration, пустой Mini App и CI checks без внешних credentials.
-- [x] Проверить локально typecheck, unit tests, build и D1 migration/schema.
-- [ ] Проверить `/start`, подписку и открытие Mini App на тестовых настройках.
-- [ ] Создать/проверить внешние Cloudflare ресурсы и пройти живой Telegram flow после безопасной настройки доступов.
+- [x] Подтвердить GitHub secrets `CLOUDFLARE_API_TOKEN` и `CLOUDFLARE_ACCOUNT_ID`. Раскрытые credentials не использованы.
+- [x] Подтвердить, что Telegram Worker secrets заданы владельцем в Cloudflare.
+- [ ] Подтвердить Telegram bot username, обязательный канал, channel ID/URL и необходимые права.
+- [ ] Подтвердить домен или Worker URL и способ разделения preview/production.
+- [x] Выбрать GitHub Actions для CI и deploy.
+- [x] Реализовать Worker, health endpoint, Telegram webhook, D1 migrations, пустой Mini App и CI checks.
+- [x] Добавить deploy job с guard и workflow `Setup D1`.
+- [x] Проверить локально typecheck, 14 unit tests, build, миграции и smoke test.
+- [ ] Запустить `Setup D1`, записать реальный database ID и включить deploy.
+- [ ] Задать публичные Worker vars: bot username, channel ID/URL, app URL, owner ID.
+- [ ] Зарегистрировать Telegram webhook на публичном Worker URL.
+- [ ] Проверить `/start`, подписку и открытие Mini App на реальных настройках.
+- [ ] Проверить живой health endpoint и пройти Telegram flow после деплоя.
 
 Весь Этап 1 остаётся незавершённым до живых Cloudflare и Telegram проверок. Не переходить к Этапу 2.
 

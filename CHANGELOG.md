@@ -11,3 +11,6 @@
 - Добавлен локальный React/Vite Mini App, Hono Worker health endpoint и начальная D1 migration.
 - Добавлены GitHub Actions CI checks без deploy и документация команд локальной проверки.
 - Этап 1 остаётся частично выполненным: внешние Cloudflare ресурсы и Telegram flow не настроены.
+- Добавлены Telegram webhook с проверкой secret, идемпотентностью и обработкой `/start` без фиктивных статусов.
+- Добавлены deploy workflow с guard, `Setup D1` workflow и документация по GitHub/Cloudflare переменным.
+- GitHub secrets подтверждены; remote D1, публичные vars и живой Telegram flow остаются заблокированными.

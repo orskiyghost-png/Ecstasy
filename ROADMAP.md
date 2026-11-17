@@ -5,7 +5,7 @@
 | Этап | Содержание | Статус |
 |---|---|---|
 | 0 — аудит и проектирование | Аудит репозитория, архитектура, документы, `.gitignore`, `.env.example` | Завершён, документация проверена локально |
-| 1 — инфраструктура и подключение | Worker, D1, выбранный CI/CD, Telegram bot, канал и пустой Mini App | Локальный каркас проверен; внешняя инфраструктура и Telegram flow заблокированы |
+| 1 — инфраструктура и подключение | Worker, D1, выбранный CI/CD, Telegram bot, канал и пустой Mini App | Код webhook и deploy workflow готовы; remote D1 и живой деплой заблокированы |
 | 2 — frontend shell | Токены, оболочка, навигация, общие состояния, Telegram SDK | Не начат |
 | 3 — чаты | Реальные доступные диалоги, сообщения, поиск и пустое состояние | Не начат |
 | 4 — агент | Промпты, база знаний, выбор доступных моделей | Не начат |
@@ -17,12 +17,13 @@
 
 ## Переход к Этапу 1
 
-До создания внешней инфраструктуры проверь Cloudflare аккаунт и отозванные/ротированные credentials. Нужны безопасно настроенный Cloudflare доступ, выбранный домен (если он нужен) и Telegram bot/channel. GitHub Actions выбран для CI checks, но публикация не настроена. Не вставляй секреты в чат или файлы Git.
+GitHub secrets и Worker secrets добавлены. Проверка доступов завершена на уровне конфигурации; внешние ресурсы ещё не созданы. Нужны remote D1, реальный database ID, домен или Worker URL, Telegram channel/bot публичные значения. Deploy выключен переменной `CLOUDFLARE_DEPLOY_ENABLED=false`. Не вставляй секреты в чат или файлы Git.
 
 ## Подфаза локального каркаса Этапа 1
 
-- Реализованы React/Vite Mini App, Hono Worker и `GET /api/health` с проверкой D1.
-- Добавлены начальная D1 migration и GitHub Actions CI без секретов и deploy.
-- Typecheck, unit tests, build и локальная D1 migration проверены.
-- Внешний Worker/D1, домен, Telegram bot/channel, webhook и `/start` не созданы и не проверены.
+- Реализованы React/Vite Mini App, Hono Worker, `GET /api/health` и `POST /api/telegram/webhook`.
+- Добавлены D1 migrations users и telegram_updates, GitHub Actions CI и deploy job с guard, Setup D1 workflow.
+- Typecheck, 14 unit tests, build, локальные миграции и smoke test проверены.
+- GitHub secrets подтверждены; Telegram Worker secrets заданы владельцем.
+- Remote D1, реальный database ID, публичные vars, регистрация webhook и живой `/start` не выполнены.
 - Весь Этап 1 остаётся частично выполненным и заблокированным; к Этапу 2 не переходить.

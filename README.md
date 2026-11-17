@@ -1,6 +1,6 @@
 # Ecstasy
 
-Локальный каркас Telegram Mini App и API на одном Cloudflare Worker.
+Локально проверенный каркас Telegram Mini App и API на одном Cloudflare Worker.
 
 ## Требования
 
@@ -15,8 +15,9 @@ npm run db:migrate:local
 npm run dev
 ```
 
-Vite поднимает Mini App и Worker. API health endpoint: `/api/health`.
+Vite поднимает Mini App и Worker. API endpoints: `/api/health` и `POST /api/telegram/webhook`.
 Локальная D1 создаётся Wrangler автоматически; миграции лежат в `migrations/`.
+Webhook требует заголовок `x-telegram-bot-api-secret-token` и использует D1 для идемпотентности.
 
 ## Проверки
 
@@ -24,14 +25,16 @@ Vite поднимает Mini App и Worker. API health endpoint: `/api/health`.
 npm run typecheck
 npm test
 npm run build
+npm run db:migrate:check
+npm run smoke:local
 ```
 
-GitHub Actions запускает те же проверки для pull request и push в `main`.
-Workflow не использует secrets и не выполняет deploy.
+GitHub Actions запускает `typecheck`, `test` и `build` для pull request и push в `main`.
+Deploy job включается переменной `CLOUDFLARE_DEPLOY_ENABLED` только после создания remote D1.
 
 ## Ограничения статуса
 
-Это только локальный каркас. Cloudflare Worker и D1 в аккаунте не созданы;
-домен, Telegram bot, канал, webhook и опубликованный Mini App не настроены.
-Health endpoint проверяет D1, но не реализует пользовательскую авторизацию.
-Этап 1 остаётся незавершённым до проверки внешней инфраструктуры и Telegram flow.
+Это локально проверенный каркас, не опубликованный деплой. GitHub secrets добавлены;
+Telegram Worker secrets заданы владельцем. Remote D1, реальный database ID, домен,
+канал, bot username и Mini App URL неизвестны. Health endpoint и webhook проверены локально.
+Живой Telegram flow не проверен. Этап 1 остаётся незавершённым.

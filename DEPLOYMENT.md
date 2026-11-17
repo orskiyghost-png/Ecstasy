@@ -2,26 +2,28 @@
 
 ## Целевая схема
 
-Локальная конфигурация готовит один Cloudflare Worker, публикующий Vite static assets и обслуживающий API. Это не опубликованный или проверенный внешний deploy. Telegram webhook ещё не реализован.
+Конфигурация готовит один Cloudflare Worker, публикующий Vite static assets, API и Telegram webhook. Это не опубликованный или проверенный внешний deploy.
 
-## Пока не настроено
+## Подтверждённое и заблокированное
 
-- Cloudflare Worker, D1 database и bindings в аккаунте не подтверждены.
-- Домен, DNS и production/preview URLs неизвестны.
-- GitHub Actions CI проверяет typecheck, tests и build; deploy workflow не настроен.
-- Telegram bot, webhook и Mini App URL не настроены.
-- Wrangler config и CI workflow существуют только для локальной сборки и автоматических проверок; production bindings не настроены.
-- `wrangler.jsonc` использует `database_id: "local-only-placeholder"`; он нужен только для изолированной локальной D1 и не является внешним ресурсом.
+- GitHub secrets `CLOUDFLARE_API_TOKEN` и `CLOUDFLARE_ACCOUNT_ID` добавлены.
+- Telegram Worker secrets `TELEGRAM_BOT_TOKEN` и `TELEGRAM_WEBHOOK_SECRET` заданы владельцем в Cloudflare.
+- GitHub Actions проверяет `typecheck`, `test`, `build`. Deploy job добавлен, но выключен переменной `CLOUDFLARE_DEPLOY_ENABLED=false`.
+- Создан `workflow_dispatch` workflow `Setup D1` для создания remote D1.
+- Cloudflare Worker и remote D1 ещё не созданы; `wrangler.jsonc` содержит `database_id: "local-only-placeholder"`.
+- Домен, DNS, `APP_BASE_URL`, `TELEGRAM_CHANNEL_ID`, `TELEGRAM_CHANNEL_URL`, `TELEGRAM_BOT_USERNAME` и `OWNER_TELEGRAM_ID` неизвестны.
+- Регистрация Telegram webhook и живой `/start` не выполнены.
 
 ## Правила будущей публикации
 
 1. Перед настройкой отозвать раскрытые в чате Cloudflare API и R2 credentials; новые секреты выдавать с минимальными правами и хранить вне Git.
-2. Выбрать один механизм CI/CD публикации: GitHub Actions либо Cloudflare build integration. Не включать конкурирующие deploy-триггеры для одного приложения.
+2. Использовать только GitHub Actions. Не включать Cloudflare build integration или другие deploy-триггеры для одного приложения.
 3. Разделить production и preview bindings/configuration; не направлять preview на production D1 без явного решения и изоляции.
 4. Публиковать только после успешной сборки и применимых проверок. Ошибка сборки не должна обновлять production.
-5. Добавить Telegram webhook только после настройки Worker URL и случайного webhook secret через безопасные bindings.
-6. После публикации проверить фактический URL, Worker health/error logs без секретов и тестовый Telegram flow. Не объявлять deploy успешным до проверки.
+5. Записать реальный D1 database ID в `wrangler.jsonc`, затем переключить `CLOUDFLARE_DEPLOY_ENABLED` в `true`.
+6. Зарегистрировать Telegram webhook только после настройки Worker URL и webhook secret через безопасные bindings.
+7. После публикации проверить фактический URL, health endpoint, Worker logs без секретов и тестовый Telegram flow. Не объявлять deploy успешным до проверки.
 
 ## Внешние действия владельца
 
-Потребуются подтверждённый Cloudflare account, новые безопасные credentials или другой одобренный способ авторизации, решение о домене и доступ к Telegram bot/channel. Точные действия зависят от фактических ресурсов; неизвестные значения нельзя подставлять заранее.
+Нужно запустить `Setup D1`, записать полученный ID, задать публичные vars и включить deploy. Затем зарегистрировать webhook и проверить `/start` на реальном боте. Неизвестные значения нельзя подставлять заранее.
