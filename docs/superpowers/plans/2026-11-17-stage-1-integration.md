@@ -44,7 +44,7 @@
 - Consumes: `D1Database` из `@cloudflare/workers-types`.
 - Produces: `Env` с полями `DB?`, `TELEGRAM_BOT_TOKEN?`, `TELEGRAM_WEBHOOK_SECRET?`, `TELEGRAM_BOT_USERNAME?`, `TELEGRAM_CHANNEL_ID?`, `TELEGRAM_CHANNEL_URL?`, `APP_BASE_URL?`, `OWNER_TELEGRAM_ID?`.
 
-- [ ] **Step 1: Создать failing test для migration**
+- [x] **Step 1: Создать failing test для migration**
 
 ```ts
 import { readFileSync } from "node:fs";
@@ -65,12 +65,12 @@ describe("telegram update migration", () => {
 });
 ```
 
-- [ ] **Step 2: Запустить тест и подтвердить падение**
+- [x] **Step 2: Запустить тест и подтвердить падение**
 
 Run: `npm test -- tests/migrations-telegram.test.ts`
 Expected: FAIL, файл миграции не найден.
 
-- [ ] **Step 3: Реализовать `worker/env.ts` и миграцию**
+- [x] **Step 3: Реализовать `worker/env.ts` и миграцию**
 
 `worker/env.ts` экспортирует `interface Env` со списком полей из Interfaces. Все поля необязательные.
 
@@ -85,17 +85,17 @@ CREATE TABLE IF NOT EXISTS telegram_updates (
 
 В `worker/app.ts` заменить локальное объявление `Env` на `import type { Env } from "./env"`.
 
-- [ ] **Step 4: Запустить тест и убедиться в прохождении**
+- [x] **Step 4: Запустить тест и убедиться в прохождении**
 
 Run: `npm test -- tests/migrations-telegram.test.ts`
 Expected: PASS, 1 test.
 
-- [ ] **Step 5: Проверить typecheck и локальную миграцию**
+- [x] **Step 5: Проверить typecheck и локальную миграцию**
 
 Run: `npm run typecheck && npm run db:migrate:local`
 Expected: оба завершаются без ошибок.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add worker/env.ts migrations/0002_telegram.sql tests/migrations-telegram.test.ts worker/app.ts
@@ -121,19 +121,19 @@ git commit -m "feat: add telegram env contract and idempotency migration"
   - `handleTelegramWebhook(request: Request, env: Env): Promise<Response>`
   - `TelegramUpdate`: `{ update_id: number; message?: { message_id: number; chat: { id: number }; from?: { id: number }; text?: string } }`
 
-- [ ] **Step 1: Написать failing tests для secret и идемпотентности**
+- [x] **Step 1: Написать failing tests для secret и идемпотентности**
 
 В `tests/telegram-webhook.test.ts` добавить тесты:
 - `rejects requests without the webhook secret`: `Request` без заголовка → статус `401`, JSON `{ ok: false }`, `fetch` не вызывался.
 - `rejects an invalid webhook secret`: неверный заголовок → статус `401`.
 - `ignores a duplicate update`: D1 возвращает существующую строку для `update_id`, `sendMessage` не вызывается, ответ `200` и `{ ok: true, duplicate: true }`.
 
-- [ ] **Step 2: Запустить тесты и подтвердить падение**
+- [x] **Step 2: Запустить тесты и подтвердить падение**
 
 Run: `npm test -- tests/telegram-webhook.test.ts`
 Expected: FAIL, модуль `worker/telegram-webhook` не найден.
 
-- [ ] **Step 3: Реализовать `worker/telegram.ts`**
+- [x] **Step 3: Реализовать `worker/telegram.ts`**
 
 `telegramApiUrl` возвращает `https://api.telegram.org/bot${token}/${method}`.
 `callTelegramApi` делает `POST` с `Content-Type: application/json` и разбирает JSON.
@@ -141,7 +141,7 @@ Expected: FAIL, модуль `worker/telegram-webhook` не найден.
 `getChatMember` вызывает `getChatMember` с `chat_id` и `user_id`.
 `sendMessage` вызывает `sendMessage` с `chat_id`, `text` и опциональным `reply_markup`.
 
-- [ ] **Step 4: Реализовать `worker/telegram-webhook.ts`**
+- [x] **Step 4: Реализовать `worker/telegram-webhook.ts`**
 
 `handleTelegramWebhook`:
 1. Проверяет `x-telegram-bot-api-secret-token` через `safeEqual`; при отсутствии secret в env или несовпадении returns `401` `{ ok: false }`.
@@ -159,7 +159,7 @@ Expected: FAIL, модуль `worker/telegram-webhook` не найден.
 
 В `worker/app.ts` зарегистрировать `app.post("/api/telegram/webhook", ...)` через `handleTelegramWebhook`.
 
-- [ ] **Step 5: Добавить remaining Review Focus тесты**
+- [x] **Step 5: Добавить remaining Review Focus тесты**
 
 В `tests/telegram-webhook.test.ts` добавить:
 - `start without channel config says channel is not configured and sends no button`
@@ -168,17 +168,17 @@ Expected: FAIL, модуль `worker/telegram-webhook` не найден.
 - `start without APP_BASE_URL sends no button`
 - `safeEqual accepts equal strings and rejects mismatched strings`
 
-- [ ] **Step 6: Запустить тесты и убедиться в прохождении**
+- [x] **Step 6: Запустить тесты и убедиться в прохождении**
 
 Run: `npm test -- tests/telegram-webhook.test.ts`
 Expected: PASS, 9 tests.
 
-- [ ] **Step 7: Полные проверки**
+- [x] **Step 7: Полные проверки**
 
 Run: `npm run typecheck && npm test && npm run build && npm run smoke:local`
 Expected: все завершаются без ошибок.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add worker/telegram.ts worker/telegram-webhook.ts tests/telegram-webhook.test.ts worker/app.ts
@@ -197,25 +197,25 @@ git commit -m "feat: add telegram webhook with idempotency"
 - Consumes: `dist/worker/wrangler.json`, созданный `npm run build`.
 - Produces: deploy job в `ci.yml`; manual workflow для создания D1.
 
-- [ ] **Step 1: Добавить `workflow_dispatch` workflow для создания D1**
+- [x] **Step 1: Добавить `workflow_dispatch` workflow для создания D1**
 
 `.github/workflows/setup-d1.yml`: `on: workflow_dispatch`, `permissions: contents: read`, checkout, setup-node `26`, `npm ci`, `npx wrangler d1 create ecstasy` с env:
 `CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}`, `CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}`.
 
-- [ ] **Step 2: Добавить deploy job в `ci.yml`**
+- [x] **Step 2: Добавить deploy job в `ci.yml`**
 
 После job `checks` добавить `deploy` с `needs: checks`, `if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.CLOUDFLARE_DEPLOY_ENABLED == 'true'`, `environment: production`, `permissions: contents: read`. Шаги: checkout, setup-node `26`, `npm ci`, `npm run build`, `npx wrangler d1 migrations apply ecstasy --remote`, `npx wrangler deploy --config dist/worker/wrangler.json`. Env для Wrangler-шагов: те же два GitHub secret. Переменная репозитория `CLOUDFLARE_DEPLOY_ENABLED` создаётся со значением `false` и переключается в `true` только после записи реального D1 database ID.
 
-- [ ] **Step 3: Проверить YAML и отсутствие secret refs вне workflow**
+- [x] **Step 3: Проверить YAML и отсутствие secret refs вне workflow**
 
 Run: локальный парсер YAML + `grep -R "secrets\." .github/workflows`
 Expected: валидный YAML; `secrets.*` встречается только в `ci.yml` и `setup-d1.yml`.
 
-- [ ] **Step 4: Обновить документацию**
+- [x] **Step 4: Обновить документацию**
 
 Отразить: GitHub secrets подтверждены; Worker secrets заданы владельцем; remote D1 и deploy заблокированы до реального database ID и публичных vars; R2 не используется; Этап 1 остаётся незавершённым до живого smoke test и registration webhook.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add .github/workflows/ci.yml .github/workflows/setup-d1.yml README.md ENVIRONMENT.md DEPLOYMENT.md ROADMAP.md TASKS.md CHANGELOG.md docs/superpowers/specs/2026-11-17-stage-1-integration-design.md docs/superpowers/plans/2026-11-17-stage-1-integration.md
@@ -232,11 +232,11 @@ git commit -m "feat: add cloudflare deploy workflow and d1 setup"
 - Consumes: database ID из вывода `workflow_dispatch` из Task 3.
 - Produces: реальный remote D1 binding; подтверждённый deploy.
 
-- [ ] **Step 1: Запустить `Setup D1` в GitHub Actions и взять database ID из лога**
+- [x] **Step 1: Запустить `Setup D1` в GitHub Actions и взять database ID из лога**
 
 Expected: D1 `ecstasy` создан, лог содержит database ID. ID не секрет, но не выдумывать.
 
-- [ ] **Step 2: Записать ID в `wrangler.jsonc` вместо `local-only-placeholder`, commit и push**
+- [x] **Step 2: Записать ID в `wrangler.jsonc` вместо `local-only-placeholder`, commit и push**
 
 ```bash
 git add wrangler.jsonc
@@ -244,23 +244,23 @@ git commit -m "chore: configure remote d1 database"
 git push origin main
 ```
 
-- [ ] **Step 3: Дождаться deploy job в GitHub Actions и проверить job log**
+- [x] **Step 3: Дождаться deploy job в GitHub Actions и проверить job log**
 
-Expected: migrations и deploy завершились успешно.
+Expected: migrations и deploy завершились успешно. Первый run `44172221839` упал из-за `database_name: "ecstasy-local"`; исправлено commit `0040602`, повторный run `44172513937` прошёл.
 
-- [ ] **Step 4: Выполнить живой smoke test публичного URL**
+- [x] **Step 4: Выполнить живой smoke test публичного URL**
 
 Run: `curl https://<actual-worker-url>/api/health`
 Expected: `200`, JSON `{ "status": "ok", "database": "available" }`.
 
-- [ ] **Step 5: Обновить статусы и зафиксировать результат**
+- [x] **Step 5: Обновить статусы и зафиксировать результат**
 
-Обновить `README.md`, `DEPLOYMENT.md`, `ROADMAP.md`, `TASKS.md`, `CHANGELOG.md`. Если Telegram channel ID/URL и APP_BASE_URL всё ещё неизвестны, оставить webhook registration и `/start` проверку заблокированными.
+Обновить `README.md`, `ENVIRONMENT.md`, `DEPLOYMENT.md`, `ROADMAP.md`, `TASKS.md`, `CHANGELOG.md`. `APP_BASE_URL` задан как Worker URL. Telegram channel ID/URL остаются неизвестными; оставить webhook registration и `/start` проверку заблокированными.
 
-- [ ] **Step 6: Commit и push**
+- [x] **Step 6: Commit и push**
 
 ```bash
-git add README.md DEPLOYMENT.md ROADMAP.md TASKS.md CHANGELOG.md
+git add wrangler.jsonc README.md ENVIRONMENT.md DEPLOYMENT.md ROADMAP.md TASKS.md CHANGELOG.md docs/superpowers/plans/2026-11-17-stage-1-integration.md
 git commit -m "docs: record stage 1 live verification"
 git push origin main
 ```

@@ -34,7 +34,8 @@ Deploy job включается переменной `CLOUDFLARE_DEPLOY_ENABLED`
 
 ## Ограничения статуса
 
-Это локально проверенный каркас, не опубликованный деплой. GitHub secrets добавлены;
-Telegram Worker secrets заданы владельцем. Remote D1, реальный database ID, домен,
-канал, bot username и Mini App URL неизвестны. Health endpoint и webhook проверены локально.
+Worker опубликован: `https://ecstasy.orskiyghost.workers.dev`.
+Живой `GET /api/health` вернул `{"status":"ok","database":"available"}`; SPA отдаёт `200`.
+Remote D1 создан, миграции применены, deploy включён. Telegram Worker secrets заданы владельцем.
+Bot username, channel ID/URL и owner ID неизвестны; webhook ещё не зарегистрирован.
 Живой Telegram flow не проверен. Этап 1 остаётся незавершённым.

@@ -11,21 +11,21 @@
 - [x] Проверить diff, форматирование и отсутствие известных форматов секретов в новых файлах.
 - [x] Создать commit и отправить в `origin/main`.
 
-## Этап 1 — код готов; живая интеграция заблокирована
+## Этап 1 — деплой проверен; Telegram flow заблокирован
 
 - [x] Подтвердить GitHub secrets `CLOUDFLARE_API_TOKEN` и `CLOUDFLARE_ACCOUNT_ID`. Раскрытые credentials не использованы.
 - [x] Подтвердить, что Telegram Worker secrets заданы владельцем в Cloudflare.
 - [ ] Подтвердить Telegram bot username, обязательный канал, channel ID/URL и необходимые права.
-- [ ] Подтвердить домен или Worker URL и способ разделения preview/production.
+- [x] Подтвердить Worker URL `https://ecstasy.orskiyghost.workers.dev`. Разделение preview/production не реализовано.
 - [x] Выбрать GitHub Actions для CI и deploy.
 - [x] Реализовать Worker, health endpoint, Telegram webhook, D1 migrations, пустой Mini App и CI checks.
 - [x] Добавить deploy job с guard и workflow `Setup D1`.
 - [x] Проверить локально typecheck, 14 unit tests, build, миграции и smoke test.
-- [ ] Запустить `Setup D1`, записать реальный database ID и включить deploy.
-- [ ] Задать публичные Worker vars: bot username, channel ID/URL, app URL, owner ID.
+- [x] Запустить `Setup D1`, записать реальный database ID и включить deploy.
+- [ ] Задать публичные Worker vars: bot username, channel ID/URL, owner ID. `APP_BASE_URL` задан в `wrangler.jsonc`.
 - [ ] Зарегистрировать Telegram webhook на публичном Worker URL.
 - [ ] Проверить `/start`, подписку и открытие Mini App на реальных настройках.
-- [ ] Проверить живой health endpoint и пройти Telegram flow после деплоя.
+- [x] Проверить живой health endpoint: `{"status":"ok","database":"available"}`, SPA `200`.
 
 Весь Этап 1 остаётся незавершённым до живых Cloudflare и Telegram проверок. Не переходить к Этапу 2.
 

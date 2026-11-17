@@ -5,7 +5,7 @@
 | Этап | Содержание | Статус |
 |---|---|---|
 | 0 — аудит и проектирование | Аудит репозитория, архитектура, документы, `.gitignore`, `.env.example` | Завершён, документация проверена локально |
-| 1 — инфраструктура и подключение | Worker, D1, выбранный CI/CD, Telegram bot, канал и пустой Mini App | Код webhook и deploy workflow готовы; remote D1 и живой деплой заблокированы |
+| 1 — инфраструктура и подключение | Worker, D1, выбранный CI/CD, Telegram bot, канал и пустой Mini App | Worker и D1 задеплоены, health проверен; Telegram flow заблокирован |
 | 2 — frontend shell | Токены, оболочка, навигация, общие состояния, Telegram SDK | Не начат |
 | 3 — чаты | Реальные доступные диалоги, сообщения, поиск и пустое состояние | Не начат |
 | 4 — агент | Промпты, база знаний, выбор доступных моделей | Не начат |
@@ -17,13 +17,16 @@
 
 ## Переход к Этапу 1
 
-GitHub secrets и Worker secrets добавлены. Проверка доступов завершена на уровне конфигурации; внешние ресурсы ещё не созданы. Нужны remote D1, реальный database ID, домен или Worker URL, Telegram channel/bot публичные значения. Deploy выключен переменной `CLOUDFLARE_DEPLOY_ENABLED=false`. Не вставляй секреты в чат или файлы Git.
+GitHub secrets подтверждены. Remote D1 создан, database ID записан, deploy включён. Worker опубликован: `https://ecstasy.orskiyghost.workers.dev`. Живой `GET /api/health` вернул `{"status":"ok","database":"available"}`, SPA отдаёт `200`.
 
-## Подфаза локального каркаса Этапа 1
+Telegram Worker secrets заданы владельцем. Bot username, channel ID/URL и owner ID неизвестны. Webhook не зарегистрирован. Не вставляй секреты в чат или файлы Git.
+
+## Подфаза живого деплоя Этапа 1
 
 - Реализованы React/Vite Mini App, Hono Worker, `GET /api/health` и `POST /api/telegram/webhook`.
 - Добавлены D1 migrations users и telegram_updates, GitHub Actions CI и deploy job с guard, Setup D1 workflow.
 - Typecheck, 14 unit tests, build, локальные миграции и smoke test проверены.
-- GitHub secrets подтверждены; Telegram Worker secrets заданы владельцем.
-- Remote D1, реальный database ID, публичные vars, регистрация webhook и живой `/start` не выполнены.
-- Весь Этап 1 остаётся частично выполненным и заблокированным; к Этапу 2 не переходить.
+- CI run `44172513937` завершил `checks` и `deploy`. Worker и remote D1 доступны.
+- `APP_BASE_URL` добавлен в `wrangler.jsonc`; новая версия выйдет после следующего push.
+- Публичные Telegram values, регистрация webhook и живой `/start` остаются заблокированными.
+- Весь Этап 1 остаётся незавершённым; к Этапу 2 не переходить.
