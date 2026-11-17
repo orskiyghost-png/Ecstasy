@@ -8,3 +8,6 @@
 - Зафиксировано решение проектировать единый Cloudflare Worker для static assets, API и webhook с D1.
 - Добавлены `.gitignore` и безопасный `.env.example` без значений секретов.
 - Задокументировано, что Cloudflare API и R2 credentials были отправлены в чат и требуют отзыва/ротации до использования.
+- Добавлен локальный React/Vite Mini App, Hono Worker health endpoint и начальная D1 migration.
+- Добавлены GitHub Actions CI checks без deploy и документация команд локальной проверки.
+- Этап 1 остаётся частично выполненным: внешние Cloudflare ресурсы и Telegram flow не настроены.

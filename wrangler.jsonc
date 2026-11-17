@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "ecstasy",
+  "main": "./worker/index.ts",
+  "compatibility_date": "2026-11-17",
+  "upload_source_maps": true,
+  "assets": {
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ecstasy-local",
+      "database_id": "local-only-placeholder",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

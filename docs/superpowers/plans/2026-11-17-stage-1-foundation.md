@@ -63,17 +63,17 @@
 - Тест: `tests/worker.test.ts`
 
 **Интерфейсы:**
-- Worker env: `interface Env { DB: D1Database }`.
+- Worker env: `interface Env { DB?: D1Database }`.
 - Hono app экспортирует `createApp()`; `GET /api/health` возвращает JSON `{ status: "ok" | "degraded", database: "available" | "unavailable" }`.
 - `GET /api/health` выполняет `SELECT 1` через D1; при отсутствующем binding или ошибке возвращает `503` и degraded JSON без секрета или exception details.
 - SPA показывает «Каркас Mini App готов» и поясняет, что Telegram ещё не подключён; никаких fake data или кнопок подключения.
 
-- [ ] Написать tests: healthy D1 возвращает `200` и `status: "ok"`; отсутствующий/ошибочный D1 возвращает `503` и `status: "degraded"`.
-- [ ] Добавить минимальные dependencies, Vite plugin и lock-файл выбранного npm.
-- [ ] Настроить strict TypeScript и Vite plugin для единого Worker с SPA assets.
-- [ ] Реализовать Hono app и Worker entry с D1 binding.
-- [ ] Создать простую адаптивную SPA с Telegram-статусом «не подключён» и без фиктивных данных.
-- [ ] Запустить тесты и `npm run build`; подтвердить оба результата.
+- [x] Написать tests: healthy D1 возвращает `200` и `status: "ok"`; отсутствующий/ошибочный D1 возвращает `503` и `status: "degraded"`.
+- [x] Добавить минимальные dependencies, Vite plugin и lock-файл выбранного npm.
+- [x] Настроить strict TypeScript и Vite plugin для единого Worker с SPA assets.
+- [x] Реализовать Hono app и Worker entry с D1 binding.
+- [x] Создать простую адаптивную SPA с Telegram-статусом «не подключён» и без фиктивных данных.
+- [x] Запустить typecheck, tests и `npm run build`; результат подтверждён локально.
 - [ ] Проверить `git diff --check` и секреты, затем commit: `feat: scaffold worker mini app`.
 
 ### Задача 2: Добавить D1 schema и локальные миграционные проверки
@@ -84,14 +84,14 @@
 - Тест: `tests/migrations.test.ts`
 
 **Интерфейсы:**
-- Binding `DB` ссылается на placeholder database name и локальный migration directory; production `database_id` не выдумывать.
+- Binding `DB` ссылается на placeholder database name, локальный migration directory и `local-only-placeholder`; production ID не выдумывать.
 - Первая таблица — `users` с внутренним primary key, уникальным Telegram ID только как nullable до реализации auth, `created_at` и `updated_at`.
 - В миграции нет реальных пользовательских записей, аккаунтных данных или секретов.
 
-- [ ] Зафиксировать SQL constraints и индексы в migration.
-- [ ] Проверить миграцию через Wrangler local D1 на чистом временном состоянии.
-- [ ] Проверить таблицу и ограничения локальным SQL запросом.
-- [ ] Не создавать удалённую D1 до безопасной авторизации и подтверждения названия ресурса.
+- [x] Зафиксировать SQL constraints и индексы в migration.
+- [x] Проверить миграцию через Wrangler local D1 на чистом временном состоянии.
+- [x] Проверить таблицу и ограничения локальным SQL запросом.
+- [x] Не создавать удалённую D1 до безопасной авторизации и подтверждения названия ресурса.
 - [ ] Запустить unit tests, build и D1 migration check; затем commit: `feat: add local d1 foundation`.
 
 ### Задача 3: Добавить GitHub Actions CI и точные команды
@@ -102,14 +102,14 @@
 - Изменить: `README.md`
 
 **Интерфейсы:**
-- Scripts: `npm run dev`, `npm run typecheck`, `npm test`, `npm run build`, `npm run db:migrate:local`.
+- Scripts: `npm run dev`, `npm run typecheck`, `npm test`, `npm run build`, `npm run db:migrate:local`, `npm run db:migrate:check`, `npm run db:check:local`.
 - CI запускается для pull request и push в `main`; устанавливает версии из lock-файла и выполняет typecheck, tests, build.
 - Workflow не читает secrets, не создаёт Cloudflare resources и не вызывает deploy.
 
-- [ ] Добавить воспроизводимые npm scripts и README с локальными командами без секретов.
-- [ ] Настроить Node LTS и cache lock-файла в CI.
+- [x] Добавить воспроизводимые npm scripts и README с локальными командами без секретов.
+- [x] Настроить Node LTS и cache lock-файла в CI.
 - [ ] Проверить YAML и локально выполнить те же команды, что CI.
-- [ ] Убедиться, что CI workflow не содержит deploy action/command и secret refs.
+- [x] Убедиться, что CI workflow не содержит deploy action/command и secret refs.
 - [ ] Запустить полный CI набор локально; затем commit: `ci: add worker foundation checks`.
 
 ### Задача 4: Обновить документы, проверить и зафиксировать статус Этапа 1
@@ -130,3 +130,11 @@
 Без безопасного Cloudflare API token не создавать Worker/D1 и не настраивать deploy. Без bot token, bot username, channel ID/URL и прав бота нельзя настраивать Telegram webhook, `/start`, `getChatMember` или Mini App кнопку. Зафиксировать блокеры и точный список необходимых действий владельца; к Этапу 2 не переходить.
 
 Пока блокеры не сняты, весь Этап 1 остаётся частично выполненным и заблокированным, даже если локальные проверки каркаса проходят.
+
+## Журнал локальной реализации
+
+- React/Vite 8.3.8, Cloudflare Vite plugin 1.70.0, Hono 4.13.19, Wrangler 4.164.0, Vitest 5.1.0.
+- Локальная D1 использует `database_id: "local-only-placeholder"`; Wrangler Vite plugin build и local migration прошли.
+- `npm run typecheck`, `npm test` (4 tests), `npm run build` и production dependency audit прошли.
+- Полный `npm audit` на дату реализации сообщил 6 high vulnerabilities в dev toolchain (Vite/Vitest и transitives); обновление на уязвимости-исправленные major версии нарушает зафиксированные версии/совместимость плагина. Повторно проверить перед CI/публикацией.
+- Внешняя инфраструктура и Telegram не проверены; Этап 1 не завершён.

@@ -6,7 +6,7 @@
 
 ## Текущее состояние
 
-Этап 0 закоммичен в `main`. Исходников, package manifest, миграций, CI и Cloudflare-конфигурации ещё нет. В репозитории уже определён один Worker, Vite/React/TypeScript, Hono и D1.
+Этап 0 закоммичен в `main`. Локальный каркас Этапа 1 теперь содержит React/Vite SPA, Hono health endpoint, Wrangler D1 binding, начальную миграцию и GitHub Actions CI. Внешние Cloudflare ресурсы и Telegram flow не созданы и не проверены.
 
 Переданные в чат credentials запрещено повторно использовать согласно `AGENTS.md`; они раскрыты. В локальном окружении нет подтверждённых безопасных Cloudflare credentials, Telegram bot token, username и настроек канала. Поэтому можно создать и проверить локальный каркас, но нельзя создать Cloudflare ресурсы, зарегистрировать webhook или пройти живой Telegram flow.
 
@@ -20,10 +20,10 @@
 
 ## Объём
 
-- TypeScript, React, Vite и официальный Cloudflare Vite plugin.
+- TypeScript, React, Vite и официальный Cloudflare Vite plugin; версии зафиксированы в `package-lock.json`.
 - Один Worker с минимальной SPA и `GET /api/health`; никакой фиктивной авторизации или Telegram-сессии.
 - D1 binding, первая миграция минимальной таблицы пользователей и локальная проверка миграции. Production database ID задаётся только после создания настоящей D1.
-- GitHub Actions для install, typecheck, tests и build. Отдельный deploy workflow допустим только после настройки секретов и безопасной авторизации.
+- GitHub Actions для install, typecheck, tests и build. Текущий workflow не деплоит.
 - Документация о командах, bindings, результатах проверок и явных блокерах.
 
 Это локальная подфаза Этапа 1, а не завершение всего Этапа 1. Критерии мастер-промпта включают реальные Cloudflare ресурсы, Telegram `/start`, проверку канала, webhook и опубликованный Mini App. Пока эти пункты заблокированы, Этап 1 остаётся незавершённым; к Этапу 2 не переходить.

@@ -2,15 +2,16 @@
 
 ## Целевая схема
 
-Планируется один Cloudflare Worker, публикующий Vite static assets и обслуживающий API/webhook. Это целевой проектный выбор, а не существующий или проверенный деплой. Реализация конфигурации относится к Этапу 1.
+Локальная конфигурация готовит один Cloudflare Worker, публикующий Vite static assets и обслуживающий API. Это не опубликованный или проверенный внешний deploy. Telegram webhook ещё не реализован.
 
 ## Пока не настроено
 
 - Cloudflare Worker, D1 database и bindings в аккаунте не подтверждены.
 - Домен, DNS и production/preview URLs неизвестны.
-- GitHub Actions и Cloudflare build integration не настроены.
+- GitHub Actions CI проверяет typecheck, tests и build; deploy workflow не настроен.
 - Telegram bot, webhook и Mini App URL не настроены.
-- В репозитории нет Wrangler config или workflow-файлов.
+- Wrangler config и CI workflow существуют только для локальной сборки и автоматических проверок; production bindings не настроены.
+- `wrangler.jsonc` использует `database_id: "local-only-placeholder"`; он нужен только для изолированной локальной D1 и не является внешним ресурсом.
 
 ## Правила будущей публикации
 
