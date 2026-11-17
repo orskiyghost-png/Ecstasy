@@ -10,7 +10,9 @@
   },
   "vars": {
     "APP_BASE_URL": "https://ecstasy.orskiyghost.workers.dev",
-    "TELEGRAM_BOT_USERNAME": "ecstasy_aibot"
+    "TELEGRAM_BOT_USERNAME": "ecstasy_aibot",
+    "TELEGRAM_CHANNEL_ID": "-1004331237068",
+    "TELEGRAM_CHANNEL_URL": "https://t.me/ecstasy_ai_bot"
   },
   "d1_databases": [
     {
