@@ -20,4 +20,5 @@
 - Telegram webhook зарегистрирован на `https://ecstasy.orskiyghost.workers.dev/api/telegram/webhook`; `getWebhookInfo` подтвердил URL и `pending_update_count: 0`.
 - Подтверждён bot `@ecstasy_aibot`; `TELEGRAM_BOT_USERNAME` записан в `wrangler.jsonc`.
 - Добавлен temporary защищённый `POST /api/telegram/setup` и workflow `Telegram setup` для диагностики и регистрации без раскрытия секретов.
-- `TELEGRAM_CHANNEL_ID` и `TELEGRAM_CHANNEL_URL` отсутствуют; `/start`, проверка подписки и открытие Mini App не подтверждены. Этап 1 не завершён.
+- Настроен канал `Ecstasy AI`: `TELEGRAM_CHANNEL_ID=-1004331237068`, `TELEGRAM_CHANNEL_URL=https://t.me/ecstasy_ai_bot`; бот имеет статус `administrator`.
+- Setup-проверка подтвердила все config flags и отсутствие pending updates. Живой `/start` и открытие Mini App не подтверждены. Этап 1 не завершён.

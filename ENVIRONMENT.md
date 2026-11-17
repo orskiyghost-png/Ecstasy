@@ -2,15 +2,15 @@
 
 ## Статус
 
-Worker опубликован, Telegram webhook зарегистрирован. Webhook считывает `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_CHANNEL_ID`, `TELEGRAM_CHANNEL_URL` и `APP_BASE_URL`. `APP_BASE_URL` и `TELEGRAM_BOT_USERNAME=ecstasy_aibot` заданы в `wrangler.jsonc`. `TELEGRAM_CHANNEL_ID`, `TELEGRAM_CHANNEL_URL` и `OWNER_TELEGRAM_ID` отсутствуют. Provider переменные кодом не считываются. Единственный Worker обслуживает UI и API, отдельный `API_BASE_URL` не нужен.
+Worker опубликован, Telegram webhook зарегистрирован. Webhook считывает `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_CHANNEL_ID`, `TELEGRAM_CHANNEL_URL` и `APP_BASE_URL`. `APP_BASE_URL`, `TELEGRAM_BOT_USERNAME`, `TELEGRAM_CHANNEL_ID` и `TELEGRAM_CHANNEL_URL` заданы в `wrangler.jsonc`. `OWNER_TELEGRAM_ID` отсутствует и текущим `/start` не используется. Provider переменные кодом не считываются. Единственный Worker обслуживает UI и API, отдельный `API_BASE_URL` не нужен.
 
 | Имя | Чувствительность | Назначение | Настройка |
 |---|---|---|---|
 | `TELEGRAM_BOT_TOKEN` | Секрет | Авторизация Telegram Bot API | Cloudflare Worker secret; локально — игнорируемый `.dev.vars` |
 | `TELEGRAM_WEBHOOK_SECRET` | Секрет | Проверка заголовка webhook `secret_token` | Cloudflare Worker secret; локально — игнорируемый `.dev.vars` |
 | `TELEGRAM_BOT_USERNAME` | Публичное значение | Имя бота для ссылок/интерфейса, если потребуется | Задан в `wrangler.jsonc`: `ecstasy_aibot` |
-| `TELEGRAM_CHANNEL_ID` | Идентификатор, не секрет | Канал для проверки подписки | Worker environment; значение пока неизвестно |
-| `TELEGRAM_CHANNEL_URL` | Публичное значение | Ссылка на канал | Worker environment; значение пока неизвестно |
+| `TELEGRAM_CHANNEL_ID` | Идентификатор, не секрет | Канал для проверки подписки | Задан в `wrangler.jsonc`: `-1004331237068` |
+| `TELEGRAM_CHANNEL_URL` | Публичное значение | Ссылка на канал | Задана в `wrangler.jsonc`: `https://t.me/ecstasy_ai_bot` |
 | `APP_BASE_URL` | Публичное значение | Production URL Mini App | Задан в `wrangler.jsonc`: `https://ecstasy.orskiyghost.workers.dev` |
 | `OWNER_TELEGRAM_ID` | Идентификатор, не секрет | Сопоставление владельца с ролью; не самостоятельное доказательство авторизации | Worker environment; значение пока неизвестно |
 

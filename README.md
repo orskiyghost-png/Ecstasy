@@ -39,6 +39,7 @@ Worker опубликован: `https://ecstasy.orskiyghost.workers.dev`.
 Живой `GET /api/health` вернул `{"status":"ok","database":"available"}`; SPA отдаёт `200`.
 Remote D1 создан, миграции применены, deploy включён. Telegram bot: `@ecstasy_aibot`.
 Webhook зарегистрирован на `https://ecstasy.orskiyghost.workers.dev/api/telegram/webhook`; pending updates `0`.
-`TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET` и `APP_BASE_URL` заданы. `TELEGRAM_CHANNEL_ID` и `TELEGRAM_CHANNEL_URL` отсутствуют.
-Пока канал не настроен, `/start` отвечает сообщением о ненастроенной подписке и не открывает Mini App.
-Живой `/start` с проверкой подписки и открытием Mini App не подтверждён. Этап 1 остаётся незавершённым.
+`TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `APP_BASE_URL`, `TELEGRAM_CHANNEL_ID` и `TELEGRAM_CHANNEL_URL` заданы.
+Канал `Ecstasy AI` (`-1004331237068`, `https://t.me/ecstasy_ai_bot`) настроен; бот имеет статус `administrator`.
+Следующий `/start` должен проверить подписку и показать кнопку Mini App. Живое нажатие кнопки ещё не подтверждено.
+Этап 1 остаётся незавершённым до подтверждения `/start` и открытия Mini App.

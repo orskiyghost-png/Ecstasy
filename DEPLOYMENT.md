@@ -14,14 +14,13 @@
 - Живой smoke test после deploy: `GET /api/health` вернул `{"status":"ok","database":"available"}`; `GET /` вернул `200`; `POST /api/telegram/webhook` без secret вернул `401`.
 - `APP_BASE_URL` задан как Worker URL и подтвержден в логе deploy. `TELEGRAM_BOT_USERNAME` задан как `ecstasy_aibot`.
 - Telegram webhook зарегистрирован на `https://ecstasy.orskiyghost.workers.dev/api/telegram/webhook`. `getWebhookInfo` вернул этот URL, `pending_update_count: 0`, без `last_error_message`.
-- `POST`-проверка через защищённый setup endpoint подтвердила: bot token, webhook secret и app URL присутствуют; Telegram bot `@ecstasy_aibot`.
+- `POST`-проверка через защищённый setup endpoint подтвердила: bot token, webhook secret, app URL, channel ID и channel URL присутствуют; Telegram bot `@ecstasy_aibot`.
+- Канал `Ecstasy AI`: ID `-1004331237068`, URL `https://t.me/ecstasy_ai_bot`. `getChatMember` вернул `administrator` для бота.
 
 ## Заблокированное
 
-- `TELEGRAM_CHANNEL_ID` и `TELEGRAM_CHANNEL_URL` отсутствуют. Без них `/start` отвечает, что подписка не настроена, и не показывает Mini App.
-- `OWNER_TELEGRAM_ID` неизвестен.
-- Бот не подтверждён как администратор канала.
 - Живой `/start` с проверкой подписки и открытием Mini App не подтверждён.
+- `OWNER_TELEGRAM_ID` неизвестен; текущий `/start` его не использует.
 - R2, AI и пользовательские API не подключены.
 
 ## One-time Telegram setup
