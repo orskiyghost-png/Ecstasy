@@ -58,3 +58,13 @@ export async function sendMessage(
   if (replyMarkup !== undefined) body.reply_markup = replyMarkup;
   return callTelegramApi<unknown>(token, "sendMessage", body);
 }
+
+export async function answerCallbackQuery(
+  token: string,
+  callbackQueryId: string,
+  text?: string,
+): Promise<TelegramApiResponse<boolean>> {
+  const body: Record<string, unknown> = { callback_query_id: callbackQueryId };
+  if (text) body.text = text;
+  return callTelegramApi<boolean>(token, "answerCallbackQuery", body);
+}

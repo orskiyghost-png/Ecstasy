@@ -133,7 +133,7 @@ describe("POST /api/telegram/webhook", () => {
     expect(body.reply_markup).toBeUndefined();
   });
 
-  it("start with non-member status sends subscribe prompt and no button", async () => {
+  it("start with non-member status sends subscribe prompt with inline buttons", async () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(jsonResponse({ ok: true, result: { status: "left" } }))
@@ -156,9 +156,84 @@ describe("POST /api/telegram/webhook", () => {
     expect(response.status).toBe(200);
     expect(fetchMock).toHaveBeenCalledTimes(2);
     const body = fetchCallBody(fetchMock.mock.calls[1]);
-    expect(body.text).toContain("Подпишитесь на канал");
-    expect(body.text).toContain("https://t.me/test-channel");
-    expect(body.reply_markup).toBeUndefined();
+    expect(body.text).toContain("Чтобы открыть Mini App");
+    expect(body.text).not.toContain("https://t.me/test-channel");
+    expect(body.reply_markup.inline_keyboard[0][0]).toEqual({
+      text: "Подписаться на канал",
+      url: "https://t.me/test-channel",
+    });
+    expect(body.reply_markup.inline_keyboard[1][0]).toEqual({
+      text: "Проверить подписку",
+      callback_data: "check_subscription",
+    });
+  });
+
+  it("check_subscription confirms membership and sends the Mini App button", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse({ ok: true, result: { status: "member" } }))
+      .mockResolvedValueOnce(jsonResponse({ ok: true, result: true }))
+      .mockResolvedValueOnce(jsonResponse({ ok: true }));
+    vi.stubGlobal("fetch", fetchMock);
+    const { env } = makeDb();
+    const update: TelegramUpdate = {
+      update_id: 2,
+      callback_query: {
+        id: "callback-1",
+        from: { id: 42 },
+        data: "check_subscription",
+        message: { message_id: 10, chat: { id: 42 } },
+      },
+    };
+
+    const response = await handleTelegramWebhook(makeRequest(update), {
+      ...env,
+      TELEGRAM_BOT_TOKEN: token,
+      TELEGRAM_WEBHOOK_SECRET: secret,
+      TELEGRAM_CHANNEL_ID: "-1001",
+      APP_BASE_URL: "https://app.example",
+    });
+
+    expect(response.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    const answer = fetchCallBody(fetchMock.mock.calls[1]);
+    expect(answer.callback_query_id).toBe("callback-1");
+    expect(answer.text).toBe("Подписка подтверждена");
+    const sent = fetchCallBody(fetchMock.mock.calls[2]);
+    expect(sent.reply_markup.inline_keyboard[0][0]).toEqual({
+      text: "Открыть Mini App",
+      web_app: { url: "https://app.example" },
+    });
+  });
+
+  it("check_subscription reports a missing subscription without sending a button", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse({ ok: true, result: { status: "left" } }))
+      .mockResolvedValueOnce(jsonResponse({ ok: true, result: true }));
+    vi.stubGlobal("fetch", fetchMock);
+    const { env } = makeDb();
+    const update: TelegramUpdate = {
+      update_id: 3,
+      callback_query: {
+        id: "callback-2",
+        from: { id: 42 },
+        data: "check_subscription",
+        message: { message_id: 10, chat: { id: 42 } },
+      },
+    };
+
+    const response = await handleTelegramWebhook(makeRequest(update), {
+      ...env,
+      TELEGRAM_BOT_TOKEN: token,
+      TELEGRAM_WEBHOOK_SECRET: secret,
+      TELEGRAM_CHANNEL_ID: "-1001",
+    });
+
+    expect(response.status).toBe(200);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const answer = fetchCallBody(fetchMock.mock.calls[1]);
+    expect(answer.text).toContain("Подписка не найдена");
   });
 
   it("start with member status and configured URL sends Mini App button", async () => {

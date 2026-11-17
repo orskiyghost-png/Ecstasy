@@ -1,5 +1,6 @@
 import type { Env } from "./env";
 import {
+  answerCallbackQuery,
   getChatMember,
   safeEqual,
   sendMessage,
@@ -14,6 +15,15 @@ export interface TelegramUpdate {
     from?: { id: number };
     text?: string;
   };
+  callback_query?: {
+    id: string;
+    from?: { id: number };
+    data?: string;
+    message?: {
+      message_id: number;
+      chat: { id: number };
+    };
+  };
 }
 
 function json(body: unknown, status = 200): Response {
@@ -21,6 +31,132 @@ function json(body: unknown, status = 200): Response {
     status,
     headers: { "content-type": "application/json" },
   });
+}
+
+function subscriptionKeyboard(channelUrl?: string) {
+  const rows: Array<Array<Record<string, unknown>>> = [];
+  if (channelUrl) {
+    rows.push([{ text: "Подписаться на канал", url: channelUrl }]);
+  }
+  rows.push([{ text: "Проверить подписку", callback_data: "check_subscription" }]);
+  return { inline_keyboard: rows };
+}
+
+function miniAppKeyboard(appUrl: string) {
+  return {
+    inline_keyboard: [
+      [{ text: "Открыть Mini App", web_app: { url: appUrl } }],
+    ],
+  };
+}
+
+async function sendMiniAppLink(
+  token: string,
+  chatId: number,
+  env: Env,
+): Promise<void> {
+  if (!env.APP_BASE_URL) {
+    await sendMessage(
+      token,
+      chatId,
+      "Mini App URL не настроен. Обратитесь к администратору.",
+    );
+    return;
+  }
+
+  await sendMessage(
+    token,
+    chatId,
+    "Доступ открыт. Нажмите кнопку, чтобы перейти в Mini App.",
+    miniAppKeyboard(env.APP_BASE_URL),
+  );
+}
+
+async function isSubscribed(
+  token: string,
+  userId: number,
+  env: Env,
+): Promise<boolean> {
+  if (!env.TELEGRAM_CHANNEL_ID) return true;
+  const membership = await getChatMember(
+    token,
+    Number(env.TELEGRAM_CHANNEL_ID),
+    userId,
+  );
+  return Boolean(
+    membership.ok &&
+      membership.result &&
+      subscribedStatuses.has(membership.result.status),
+  );
+}
+
+async function handleStart(
+  token: string,
+  message: NonNullable<TelegramUpdate["message"]>,
+  env: Env,
+): Promise<Response> {
+  const chatId = message.chat.id;
+  const userId = message.from?.id ?? chatId;
+
+  if (!env.TELEGRAM_CHANNEL_ID) {
+    await sendMessage(
+      token,
+      chatId,
+      "Подписка на канал не настроена. Обратитесь к администратору.",
+    );
+    return json({ ok: true });
+  }
+
+  if (!(await isSubscribed(token, userId, env))) {
+    await sendMessage(
+      token,
+      chatId,
+      "Чтобы открыть Mini App, подпишитесь на канал Ecstasy AI.",
+      subscriptionKeyboard(env.TELEGRAM_CHANNEL_URL),
+    );
+    return json({ ok: true });
+  }
+
+  await sendMiniAppLink(token, chatId, env);
+  return json({ ok: true });
+}
+
+async function handleSubscriptionCheck(
+  token: string,
+  update: TelegramUpdate,
+  env: Env,
+): Promise<Response> {
+  const callback = update.callback_query!;
+  const chatId = callback.message?.chat.id;
+  const userId = callback.from?.id;
+
+  if (!chatId || !userId) {
+    await answerCallbackQuery(token, callback.id);
+    return json({ ok: true });
+  }
+
+  if (!env.TELEGRAM_CHANNEL_ID) {
+    await answerCallbackQuery(
+      token,
+      callback.id,
+      "Канал не настроен. Обратитесь к администратору.",
+    );
+    return json({ ok: true });
+  }
+
+  const subscribed = await isSubscribed(token, userId, env);
+  if (!subscribed) {
+    await answerCallbackQuery(
+      token,
+      callback.id,
+      "Подписка не найдена. Подпишитесь на канал и попробуйте снова.",
+    );
+    return json({ ok: true });
+  }
+
+  await answerCallbackQuery(token, callback.id, "Подписка подтверждена");
+  await sendMiniAppLink(token, chatId, env);
+  return json({ ok: true });
 }
 
 export async function handleTelegramWebhook(
@@ -62,48 +198,16 @@ export async function handleTelegramWebhook(
     return json({ ok: false }, 500);
   }
 
-  const message = update.message;
-  if (!message?.text?.startsWith("/start")) return json({ ok: true });
-
   if (!env.TELEGRAM_BOT_TOKEN) return json({ ok: false }, 500);
   const token = env.TELEGRAM_BOT_TOKEN;
-  const chatId = message.chat.id;
-  const userId = message.from?.id ?? chatId;
 
-  if (!env.TELEGRAM_CHANNEL_ID) {
-    await sendMessage(
-      token,
-      chatId,
-      "Подписка на канал не настроена. Обратитесь к администратору.",
-    );
-    return json({ ok: true });
+  if (update.message?.text?.startsWith("/start")) {
+    return handleStart(token, update.message, env);
   }
 
-  const membership = await getChatMember(
-    token,
-    Number(env.TELEGRAM_CHANNEL_ID),
-    userId,
-  );
-  if (!membership.ok || !membership.result || !subscribedStatuses.has(membership.result.status)) {
-    const prompt = "Подпишитесь на канал, чтобы открыть Mini App.";
-    const text = env.TELEGRAM_CHANNEL_URL ? `${prompt} ${env.TELEGRAM_CHANNEL_URL}` : prompt;
-    await sendMessage(token, chatId, text);
-    return json({ ok: true });
+  if (update.callback_query?.data === "check_subscription") {
+    return handleSubscriptionCheck(token, update, env);
   }
 
-  if (!env.APP_BASE_URL) {
-    await sendMessage(
-      token,
-      chatId,
-      "Mini App URL не настроен. Обратитесь к администратору.",
-    );
-    return json({ ok: true });
-  }
-
-  await sendMessage(token, chatId, "Откройте Mini App:", {
-    inline_keyboard: [
-      [{ text: "Открыть Mini App", web_app: { url: env.APP_BASE_URL } }],
-    ],
-  });
   return json({ ok: true });
 }
