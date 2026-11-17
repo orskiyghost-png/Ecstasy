@@ -1,5 +1,5 @@
 import type { Env } from "./env";
-import { callTelegramApi, safeEqual } from "./telegram";
+import { callTelegramApi, safeEqual, subscribedStatuses } from "./telegram";
 
 interface SetupBody {
   action?: string;
@@ -190,6 +190,78 @@ export async function handleTelegramSetup(
       ok: result.ok,
       chat: sanitizeChat(result.result),
       description: result.description,
+    });
+  }
+
+  if (action === "sendMiniApp") {
+    if (!env.TELEGRAM_CHANNEL_ID) {
+      return json({ ok: false, error: "TELEGRAM_CHANNEL_ID_MISSING" }, 400);
+    }
+    if (!baseUrl) {
+      return json({ ok: false, error: "APP_BASE_URL_MISSING" }, 400);
+    }
+
+    const admins = await callTelegramApi<
+      Array<{
+        status: string;
+        user: { id: number; username?: string; first_name?: string };
+      }>
+    >(token, "getChatAdministrators", {
+      chat_id: env.TELEGRAM_CHANNEL_ID,
+    });
+    const owner = admins.result?.find((admin) => admin.status === "creator");
+    if (!admins.ok || !owner) {
+      return json(
+        {
+          ok: false,
+          error: "CHANNEL_CREATOR_NOT_FOUND",
+          description: admins.description,
+        },
+        404,
+      );
+    }
+
+    const membership = await callTelegramApi<{ status: string }>(
+      token,
+      "getChatMember",
+      {
+        chat_id: env.TELEGRAM_CHANNEL_ID,
+        user_id: owner.user.id,
+      },
+    );
+    if (
+      !membership.ok ||
+      !membership.result ||
+      !subscribedStatuses.has(membership.result.status)
+    ) {
+      return json(
+        {
+          ok: false,
+          error: "CHANNEL_CREATOR_NOT_SUBSCRIBED",
+          description: membership.description,
+        },
+        400,
+      );
+    }
+
+    const sent = await callTelegramApi<unknown>(token, "sendMessage", {
+      chat_id: owner.user.id,
+      text: "Настройка завершена. Откройте Mini App:",
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "Открыть Mini App", web_app: { url: baseUrl } }],
+        ],
+      },
+    });
+
+    return json({
+      ok: sent.ok,
+      sentTo: {
+        id: owner.user.id,
+        username: owner.user.username,
+        first_name: owner.user.first_name,
+      },
+      description: sent.description,
     });
   }
 

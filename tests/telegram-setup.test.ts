@@ -188,4 +188,90 @@ describe("POST /api/telegram/setup", () => {
     });
     expect(fetchMock).not.toHaveBeenCalled();
   });
+
+  it("sends the Mini App button to the channel creator", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        jsonResponse({
+          ok: true,
+          result: [
+            {
+              status: "administrator",
+              user: { id: 11, username: "admin" },
+            },
+            {
+              status: "creator",
+              user: { id: 22, username: "owner", first_name: "Owner" },
+            },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(
+        jsonResponse({ ok: true, result: { status: "creator" } }),
+      )
+      .mockResolvedValueOnce(jsonResponse({ ok: true, result: {} }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await handleTelegramSetup(
+      makeRequest({ action: "sendMiniApp" }),
+      {
+        SETUP_TOKEN: setupToken,
+        TELEGRAM_BOT_TOKEN: botToken,
+        TELEGRAM_CHANNEL_ID: "-1001",
+        APP_BASE_URL: "https://app.example/",
+      },
+    );
+
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as { ok: boolean };
+    expect(body.ok).toBe(true);
+    expect(JSON.stringify(body)).not.toContain(botToken);
+
+    const admins = fetchCallBody(fetchMock.mock.calls[0]);
+    expect(admins).toEqual({ chat_id: "-1001" });
+
+    const membership = fetchCallBody(fetchMock.mock.calls[1]);
+    expect(membership).toEqual({ chat_id: "-1001", user_id: 22 });
+
+    const sent = fetchCallBody(fetchMock.mock.calls[2]);
+    expect(sent.chat_id).toBe(22);
+    expect(sent.reply_markup).toEqual({
+      inline_keyboard: [
+        [{ text: "Открыть Mini App", web_app: { url: "https://app.example" } }],
+      ],
+    });
+  });
+
+  it("refuses to send the Mini App without a channel creator", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(
+      jsonResponse({
+        ok: true,
+        result: [
+          {
+            status: "administrator",
+            user: { id: 11, username: "admin" },
+          },
+        ],
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const response = await handleTelegramSetup(
+      makeRequest({ action: "sendMiniApp" }),
+      {
+        SETUP_TOKEN: setupToken,
+        TELEGRAM_BOT_TOKEN: botToken,
+        TELEGRAM_CHANNEL_ID: "-1001",
+        APP_BASE_URL: "https://app.example",
+      },
+    );
+
+    expect(response.status).toBe(404);
+    expect(await response.json()).toMatchObject({
+      ok: false,
+      error: "CHANNEL_CREATOR_NOT_FOUND",
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
 });

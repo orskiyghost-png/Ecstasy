@@ -11,6 +11,7 @@ on:
         options:
           - status
           - setWebhook
+          - sendMiniApp
           - discoverChannel
           - getChat
       chat_id:

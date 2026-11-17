@@ -1,5 +1,10 @@
 import type { Env } from "./env";
-import { getChatMember, safeEqual, sendMessage } from "./telegram";
+import {
+  getChatMember,
+  safeEqual,
+  sendMessage,
+  subscribedStatuses,
+} from "./telegram";
 
 export interface TelegramUpdate {
   update_id: number;
@@ -10,8 +15,6 @@ export interface TelegramUpdate {
     text?: string;
   };
 }
-
-const subscribedStatuses = new Set(["member", "administrator", "creator"]);
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {

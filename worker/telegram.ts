@@ -1,3 +1,9 @@
+export const subscribedStatuses = new Set([
+  "member",
+  "administrator",
+  "creator",
+]);
+
 export interface TelegramApiResponse<T> {
   ok: boolean;
   result?: T;
