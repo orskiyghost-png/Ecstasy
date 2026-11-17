@@ -9,7 +9,8 @@
     "run_worker_first": ["/api/*"]
   },
   "vars": {
-    "APP_BASE_URL": "https://ecstasy.orskiyghost.workers.dev"
+    "APP_BASE_URL": "https://ecstasy.orskiyghost.workers.dev",
+    "TELEGRAM_BOT_USERNAME": "ecstasy_aibot"
   },
   "d1_databases": [
     {

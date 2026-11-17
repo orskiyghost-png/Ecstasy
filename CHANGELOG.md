@@ -17,3 +17,7 @@
 - Remote D1 `ecstasy` создан через `Setup D1`; database ID записан, deploy включён и выполнен CI run `44172513937`.
 - Worker опубликован: `https://ecstasy.orskiyghost.workers.dev`. Живой `/api/health` вернул `{"status":"ok","database":"available"}`, SPA `200`.
 - Добавлен `APP_BASE_URL` как публичная переменная Worker. Регистрация webhook и живой Telegram flow остаются заблокированными; Этап 1 не завершён.
+- Telegram webhook зарегистрирован на `https://ecstasy.orskiyghost.workers.dev/api/telegram/webhook`; `getWebhookInfo` подтвердил URL и `pending_update_count: 0`.
+- Подтверждён bot `@ecstasy_aibot`; `TELEGRAM_BOT_USERNAME` записан в `wrangler.jsonc`.
+- Добавлен temporary защищённый `POST /api/telegram/setup` и workflow `Telegram setup` для диагностики и регистрации без раскрытия секретов.
+- `TELEGRAM_CHANNEL_ID` и `TELEGRAM_CHANNEL_URL` отсутствуют; `/start`, проверка подписки и открытие Mini App не подтверждены. Этап 1 не завершён.

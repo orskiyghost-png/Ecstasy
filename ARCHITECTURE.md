@@ -48,15 +48,14 @@ Telegram Mini App (React + Vite + TypeScript)
 
 ## Деплой
 
-Цель — один deployable Worker со статическими assets, API и webhook. GitHub Actions выбран только для CI проверок; deploy не настроен. Environments, preview, домен и внешние ресурсы остаются открытыми до подтверждения доступов. Секреты не хранятся в Git.
+Один deployable Worker со статическими assets, API и webhook опубликован на `https://ecstasy.orskiyghost.workers.dev`. GitHub Actions выполняет CI и deploy; remote D1 и webhook созданы. Preview/production разделение ещё не реализовано. Секреты не хранятся в Git.
 
 ## Открытые вопросы
 
-- Какой домен и production/preview hostnames использовать?
-- Существует ли Cloudflare account и какие ресурсы уже созданы?
-- Какой Telegram bot и обязательный канал будут использоваться?
+- Как разделить production и preview bindings?
+- Какой обязательный канал использовать, какой у него ID/URL и является ли бот администратором?
+- Нужен ли отдельный домен вместо `workers.dev`?
 - Должен ли API быть same-origin? В целевой схеме отдельный API-домен пока не нужен.
-- Какой механизм CI/CD доступен и предпочтителен владельцу?
 - Каковы конкретные лимиты хранения и удаления личных сообщений?
 
 Не заполняй ответы предположениями. Уточни их перед зависимыми инфраструктурными действиями.

@@ -2,13 +2,13 @@
 
 ## Статус
 
-Worker опубликован. Webhook считывает `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_CHANNEL_ID`, `TELEGRAM_CHANNEL_URL` и `APP_BASE_URL`. `APP_BASE_URL` задан в `wrangler.jsonc` как публичная переменная. Остальные публичные значения неизвестны. Provider переменные кодом не считываются. Единственный Worker обслуживает UI и API, отдельный `API_BASE_URL` не нужен.
+Worker опубликован, Telegram webhook зарегистрирован. Webhook считывает `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_CHANNEL_ID`, `TELEGRAM_CHANNEL_URL` и `APP_BASE_URL`. `APP_BASE_URL` и `TELEGRAM_BOT_USERNAME=ecstasy_aibot` заданы в `wrangler.jsonc`. `TELEGRAM_CHANNEL_ID`, `TELEGRAM_CHANNEL_URL` и `OWNER_TELEGRAM_ID` отсутствуют. Provider переменные кодом не считываются. Единственный Worker обслуживает UI и API, отдельный `API_BASE_URL` не нужен.
 
 | Имя | Чувствительность | Назначение | Настройка |
 |---|---|---|---|
 | `TELEGRAM_BOT_TOKEN` | Секрет | Авторизация Telegram Bot API | Cloudflare Worker secret; локально — игнорируемый `.dev.vars` |
 | `TELEGRAM_WEBHOOK_SECRET` | Секрет | Проверка заголовка webhook `secret_token` | Cloudflare Worker secret; локально — игнорируемый `.dev.vars` |
-| `TELEGRAM_BOT_USERNAME` | Публичное значение | Имя бота для ссылок/интерфейса, если потребуется | Worker environment |
+| `TELEGRAM_BOT_USERNAME` | Публичное значение | Имя бота для ссылок/интерфейса, если потребуется | Задан в `wrangler.jsonc`: `ecstasy_aibot` |
 | `TELEGRAM_CHANNEL_ID` | Идентификатор, не секрет | Канал для проверки подписки | Worker environment; значение пока неизвестно |
 | `TELEGRAM_CHANNEL_URL` | Публичное значение | Ссылка на канал | Worker environment; значение пока неизвестно |
 | `APP_BASE_URL` | Публичное значение | Production URL Mini App | Задан в `wrangler.jsonc`: `https://ecstasy.orskiyghost.workers.dev` |
@@ -23,7 +23,7 @@ Wrangler конфигурация содержит реальный database ID 
 
 ## Production
 
-Telegram Worker secrets заданы владельцем в Cloudflare; локально их значение не проверялось. GitHub secrets `CLOUDFLARE_API_TOKEN` и `CLOUDFLARE_ACCOUNT_ID` подтверждены через `gh secret list`. Переменная `CLOUDFLARE_DEPLOY_ENABLED` переключена в `true` после создания remote D1. Не передавай секреты через frontend, GitHub commit, логи или документацию. После настройки проверяй только наличие имени binding, не его значение.
+Telegram Worker secrets заданы владельцем в Cloudflare; setup endpoint подтвердил их наличие без раскрытия значений. GitHub secrets `CLOUDFLARE_API_TOKEN` и `CLOUDFLARE_ACCOUNT_ID` подтверждены через `gh secret list`. Переменная `CLOUDFLARE_DEPLOY_ENABLED` переключена в `true` после создания remote D1. Temporary `SETUP_TOKEN` создаётся workflow `Telegram setup`, используется для защищённого setup endpoint и удаляется после вызова. Без него endpoint отвечает `404`. Не передавай секреты через frontend, GitHub commit, логи или документацию. После настройки проверяй только наличие имени binding, не его значение.
 
 ## Инцидент с раскрытыми credentials
 

@@ -11,15 +11,22 @@
 - GitHub Actions проверяет `typecheck`, `test`, `build`. Deploy job включён переменной `CLOUDFLARE_DEPLOY_ENABLED=true`.
 - Remote D1 `ecstasy` создан workflow `Setup D1`, реальный database ID записан в `wrangler.jsonc`, миграции применены при deploy.
 - Deploy подтвержден в runs `44172513937`, `44173249253` и `44173480948`. Worker: `https://ecstasy.orskiyghost.workers.dev`. Version ID run `44173249253`: `876f21a7-7e86-4696-a462-1720b38c22e9`.
-- Живой smoke test после последнего deploy: `GET /api/health` вернул `{"status":"ok","database":"available"}`; `GET /` вернул `200`; `POST /api/telegram/webhook` без secret вернул `401`.
-- `APP_BASE_URL` задан как Worker URL и подтвержден в логе deploy.
+- Живой smoke test после deploy: `GET /api/health` вернул `{"status":"ok","database":"available"}`; `GET /` вернул `200`; `POST /api/telegram/webhook` без secret вернул `401`.
+- `APP_BASE_URL` задан как Worker URL и подтвержден в логе deploy. `TELEGRAM_BOT_USERNAME` задан как `ecstasy_aibot`.
+- Telegram webhook зарегистрирован на `https://ecstasy.orskiyghost.workers.dev/api/telegram/webhook`. `getWebhookInfo` вернул этот URL, `pending_update_count: 0`, без `last_error_message`.
+- `POST`-проверка через защищённый setup endpoint подтвердила: bot token, webhook secret и app URL присутствуют; Telegram bot `@ecstasy_aibot`.
 
 ## Заблокированное
 
-- `TELEGRAM_BOT_USERNAME`, `TELEGRAM_CHANNEL_ID`, `TELEGRAM_CHANNEL_URL` и `OWNER_TELEGRAM_ID` неизвестны.
-- Webhook не зарегистрирован: нужен безопасный доступ к ротированному bot token.
-- Живой `/start`, проверка подписки и открытие Mini App не проверены.
+- `TELEGRAM_CHANNEL_ID` и `TELEGRAM_CHANNEL_URL` отсутствуют. Без них `/start` отвечает, что подписка не настроена, и не показывает Mini App.
+- `OWNER_TELEGRAM_ID` неизвестен.
+- Бот не подтверждён как администратор канала.
+- Живой `/start` с проверкой подписки и открытием Mini App не подтверждён.
 - R2, AI и пользовательские API не подключены.
+
+## One-time Telegram setup
+
+Workflow `Telegram setup` создаёт случайный `SETUP_TOKEN`, записывает его как Worker secret, вызывает защищённый `POST /api/telegram/setup` и удаляет secret. Endpoint не возвращает token или webhook secret. Без `SETUP_TOKEN` endpoint отвечает `404`. Использовать только для настройки и диагностики; после завершения Этапа 1 удалить endpoint и workflow.
 
 ## Правила публикации
 
@@ -33,4 +40,4 @@
 
 ## Внешние действия владельца
 
-Нужны безопасные публичные значения Telegram и способ регистрации webhook через ротированный token. Затем проверить `/start`, подписку и открытие Mini App на реальном боте. Неизвестные значения нельзя подставлять заранее.
+Нужны публичные `TELEGRAM_CHANNEL_ID` и `TELEGRAM_CHANNEL_URL` либо ссылка на канал, по которой их можно получить через Bot API. Бот должен быть администратором канала. Затем проверить `/start`, подписку и открытие Mini App на реальном боте. Неизвестные значения нельзя подставлять заранее.

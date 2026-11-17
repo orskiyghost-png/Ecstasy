@@ -255,7 +255,7 @@ Expected: `200`, JSON `{ "status": "ok", "database": "available" }`.
 
 - [x] **Step 5: Обновить статусы и зафиксировать результат**
 
-Обновить `README.md`, `ENVIRONMENT.md`, `DEPLOYMENT.md`, `ROADMAP.md`, `TASKS.md`, `CHANGELOG.md`. `APP_BASE_URL` задан как Worker URL. Telegram channel ID/URL остаются неизвестными; оставить webhook registration и `/start` проверку заблокированными.
+Обновить `README.md`, `ENVIRONMENT.md`, `DEPLOYMENT.md`, `ROADMAP.md`, `TASKS.md`, `CHANGELOG.md`. `APP_BASE_URL` задан как Worker URL, Telegram webhook зарегистрирован через защищённый temporary setup endpoint. Telegram channel ID/URL остаются неизвестными; оставить `/start` проверку заблокированной.
 
 - [x] **Step 6: Commit и push**
 
