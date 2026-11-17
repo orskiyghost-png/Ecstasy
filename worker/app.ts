@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import type { Env } from "./env";
+import { handleTelegramSetup } from "./telegram-setup";
 import { handleTelegramWebhook } from "./telegram-webhook";
 
 export function createApp() {
@@ -28,6 +29,10 @@ export function createApp() {
 
   app.post("/api/telegram/webhook", (context) =>
     handleTelegramWebhook(context.req.raw, context.env),
+  );
+
+  app.post("/api/telegram/setup", (context) =>
+    handleTelegramSetup(context.req.raw, context.env),
   );
 
   return app;

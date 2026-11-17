@@ -1,0 +1,71 @@
+name: Telegram setup
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Setup action"
+        required: true
+        default: status
+        type: choice
+        options:
+          - status
+          - setWebhook
+          - discoverChannel
+          - getChat
+      chat_id:
+        description: "Optional chat ID or @username for getChat"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      WORKER_URL: https://ecstasy.orskiyghost.workers.dev
+      ACTION: ${{ inputs.action }}
+      CHAT_ID: ${{ inputs.chat_id }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create one-time setup token
+        run: |
+          SETUP_TOKEN="$(openssl rand -hex 32)"
+          echo "SETUP_TOKEN=$SETUP_TOKEN" >> "$GITHUB_ENV"
+          echo "::add-mask::$SETUP_TOKEN"
+
+      - name: Add setup token to Worker
+        run: printf '%s' "$SETUP_TOKEN" | npx wrangler secret put SETUP_TOKEN
+
+      - name: Call setup endpoint
+        run: |
+          if [ -n "$CHAT_ID" ]; then
+            BODY="$(jq -n --arg action "$ACTION" --arg chat_id "$CHAT_ID" '{action:$action, chat_id:$chat_id}')"
+          else
+            BODY="$(jq -n --arg action "$ACTION" '{action:$action}')"
+          fi
+          curl -fsS --retry 5 --retry-delay 2 --retry-all-errors \
+            -X POST "$WORKER_URL/api/telegram/setup" \
+            -H "x-setup-token: $SETUP_TOKEN" \
+            -H "content-type: application/json" \
+            --data "$BODY" | tee /tmp/telegram-setup.json
+          jq . /tmp/telegram-setup.json
+
+      - name: Remove setup token
+        if: always()
+        run: yes | npx wrangler secret delete SETUP_TOKEN

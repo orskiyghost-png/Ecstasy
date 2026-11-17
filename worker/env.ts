@@ -7,4 +7,5 @@ export interface Env {
   TELEGRAM_CHANNEL_URL?: string;
   APP_BASE_URL?: string;
   OWNER_TELEGRAM_ID?: string;
+  SETUP_TOKEN?: string;
 }
