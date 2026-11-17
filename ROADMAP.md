@@ -27,6 +27,6 @@ Telegram Worker secrets заданы владельцем. Bot username, channel
 - Добавлены D1 migrations users и telegram_updates, GitHub Actions CI и deploy job с guard, Setup D1 workflow.
 - Typecheck, 14 unit tests, build, локальные миграции и smoke test проверены.
 - CI run `44172513937` завершил `checks` и `deploy`. Worker и remote D1 доступны.
-- `APP_BASE_URL` добавлен в `wrangler.jsonc`; новая версия выйдет после следующего push.
+- `APP_BASE_URL` подтвержден в логе deploy; живой smoke test повторен после последнего deploy.
 - Публичные Telegram values, регистрация webhook и живой `/start` остаются заблокированными.
 - Весь Этап 1 остаётся незавершённым; к Этапу 2 не переходить.

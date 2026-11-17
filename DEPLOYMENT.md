@@ -10,9 +10,9 @@
 - Telegram Worker secrets `TELEGRAM_BOT_TOKEN` и `TELEGRAM_WEBHOOK_SECRET` заданы владельцем в Cloudflare; локально значения не проверялись.
 - GitHub Actions проверяет `typecheck`, `test`, `build`. Deploy job включён переменной `CLOUDFLARE_DEPLOY_ENABLED=true`.
 - Remote D1 `ecstasy` создан workflow `Setup D1`, реальный database ID записан в `wrangler.jsonc`, миграции применены при deploy.
-- Deploy выполнен в run `44172513937` после commit `0040602`. Worker: `https://ecstasy.orskiyghost.workers.dev`. Version ID: `ddc4d138-ec65-48f5-b5d7-2e5d57dc40d9`.
-- Живой smoke test: `GET /api/health` вернул `{"status":"ok","database":"available"}`; `GET /` вернул `200`.
-- `APP_BASE_URL` задан как Worker URL и попадёт в production после следующего push.
+- Deploy подтвержден в runs `44172513937` и `44173249253`. Worker: `https://ecstasy.orskiyghost.workers.dev`. Последний Version ID: `876f21a7-7e86-4696-a462-1720b38c22e9`.
+- Живой smoke test после последнего deploy: `GET /api/health` вернул `{"status":"ok","database":"available"}`; `GET /` вернул `200`; `POST /api/telegram/webhook` без secret вернул `401`.
+- `APP_BASE_URL` задан как Worker URL и подтвержден в логе deploy.
 
 ## Заблокированное
 
